@@ -1,3 +1,4 @@
+include("./hamiltonian.jl")
 """
 Module for time evolution of quantum states using differential equations.
 
@@ -29,17 +30,10 @@ function time_evolution_trotterization(qch::QuantumComputerHamiltonian, dh::Driv
 end
 
 # Example usage
-n = 3  # Number of modes
-m = 5  # number of states
+n = 2 # Number of modes
+m = 3 # number of states
 
-device = Device()
-
-qch = create_hamiltonian(n, m, device)
-
-Ω = [0.1, 0.2, 0.3]  # Drive amplitudes
-ν = [0.9, 1.1, 1.3]  # Drive frequencies
-
-dh = create_drive_hamiltonian(Ω, ν)
+device = Device(n, m)
 
 # Initial state (ground state)
 psi0 = zeros(ComplexF64, m^n)
@@ -48,7 +42,7 @@ psi0[1] = 1.0
 T = 1.0  # Total evolution time
 dt = 0.01  # Time step for differential equation solver
 r = 100  # Number of Trotter steps
-
+dh=hdrive
 # Time evolution using differential equations
 sol_diff_eqs = time_evolution_diff_eqs(qch, dh, psi0, T, dt)
 psi_final_diff_eqs = sol_diff_eqs(T)

@@ -1,9 +1,6 @@
 using DifferentialEquations
 using LinearAlgebra
 
-using DifferentialEquations
-using LinearAlgebra
-
 # Define parameters
 const Ω = 1.0        # Amplitude of the EM field
 const ν = 1.0        # Frequency of the EM field
@@ -21,7 +18,7 @@ function VI(t)
 end
 
 # Define the Schrödinger equation in the interaction picture
-function schrodinger!(dψI, ψI, p, t)
+function schrodinger!(dψI, ψI, t)
     dψI .= -im * VI(t) * ψI
 end
 
