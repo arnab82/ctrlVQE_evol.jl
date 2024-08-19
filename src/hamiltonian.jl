@@ -15,16 +15,16 @@ mutable struct QuantumComputerHamiltonian
     omegas::Vector{Float64} # qubit resonance frequencies
     deltas::Vector{Float64} # qubit anharmonicities
     g::Matrix{Float64} # qubit-qubit coupling strengths
-    basis::Vector{Matrix{Float64}} # basis for each mode
-    a::Vector{Matrix{Float64}} # annihilation operator for each mode
+    basis::Matrix{Float64} # basis for each mode
+    a::Matrix{Float64} # annihilation operator for each mode
     Hdrive::Vector{Any} # non-dressed time-dependent Hamiltonian
     dsham::Matrix{Float64} # dressed static Hamiltonian
     states::Vector{Int} # indices of basis states
-    initial_state::Vector{Float64} # initial quantum state vector
-    istate::Vector{Int} # initial state configuration
+    initial_state::Matrix{ComplexF64} # initial quantum state vector
+    istate::Vector{Int64} # initial state configuration
 end
 
-function QuantumComputerHamiltonian(n::Int = 2, m::Int = 3, omegas::Vector{Float64} = Float64[], 
+function buildQuantumComputerHamiltonian(n::Int = 2, m::Int = 3, omegas::Vector{Float64} = Float64[], 
                                         deltas::Vector{Float64} = Float64[], g::Matrix{Float64} = zeros(Float64, 0, 0), 
                                         istate::Vector{Int} = Int[], Hstatic::Matrix{Float64} = zeros(Float64, 0, 0))
         
@@ -45,7 +45,7 @@ function QuantumComputerHamiltonian(n::Int = 2, m::Int = 3, omegas::Vector{Float
         # Time-dependent Hamiltonian
         Hdrive = t_ham(m, n)
         hdrive = mtdressed(Hamdbas, Hdrive)
-        
+        a=anih(m)
         # State indices
         states = []
         # Create the cartesian product of [0, 1] repeated `n` times
@@ -83,7 +83,7 @@ function QuantumComputerHamiltonian(n::Int = 2, m::Int = 3, omegas::Vector{Float
         println("basis:")
         display(basis_)
         println("dsham:")
-        display(dsham)
+        display(dsham_dense)
         println("hdrive:")
         display(hdrive)
         println("states:")
@@ -92,10 +92,7 @@ function QuantumComputerHamiltonian(n::Int = 2, m::Int = 3, omegas::Vector{Float
         display(in_state)
         println("istate:")
         display(istate)
-        
-        println("dsham_dense:")
-        display(dsham_dense)
-        return n, m, omegas, deltas, g, basis_, dsham_dense,hdrive,states, in_state, istate
+        return QuantumComputerHamiltonian(n, m, omegas, deltas, g, basis_, a, hdrive, dsham_dense,states, in_state, istate)
 end
 
 
@@ -383,4 +380,4 @@ Hamdbas = dresser(Hstatic, basis_)
 # Time-dependent Hamiltonian
 Hdrive = t_ham(m, n)
 hdrive = mtdressed(Hamdbas, Hdrive)
-qch = QuantumComputerHamiltonian(n, m, device.omegas, device.deltas, device.g)
+qch=buildQuantumComputerHamiltonian(n,m,device.omegas,device.deltas,device.g)
