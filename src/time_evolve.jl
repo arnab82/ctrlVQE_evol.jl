@@ -1,4 +1,3 @@
-include("./hamiltonian.jl")
 
 using SparseArrays
 using LinearAlgebra
@@ -18,8 +17,8 @@ function prune!(matrix, tol::T) where T
     dropzeros!(matrix)
 end
 function getham(t::Float64, pobj::Pulsec,
-                #hdrive::Vector{Vector{SparseMatrixCSC{Float64, Int64}}}, 
-                hdrive::Vector{Any},
+                hdrive::Vector{Vector{SparseMatrixCSC{Complex{Float64}, Int64}}}, 
+                # hdrive::Vector{Any},
                 dsham::Matrix{ComplexF64}, dsham_len::Int,
                 matexp_::SparseMatrixCSC{Complex{Float64}})
     
@@ -53,10 +52,10 @@ function getham(t::Float64, pobj::Pulsec,
     return hamr_
 end
 
-function solve_func(t::Float64, y::Matrix{ComplexF64},
+function solve_func(t::Float64, y::Vector{ComplexF64},
                     pobj::Pulsec,
-                    # hdrive::Vector{Vector{SparseMatrixCSC{Float64, Int64}}}, 
-                    hdrive::Vector{Any},
+                    hdrive::Vector{Vector{SparseMatrixCSC{Complex{Float64}, Int64}}}, 
+                    # hdrive::Vector{Any},
                     dsham::Matrix{ComplexF64}
                 )
     
@@ -134,21 +133,5 @@ function solve_trotter(tlist, ini_vec,
     return trot_
 end
 
-n=2
-m=3
 
-device = Device(n,m)
-Hstatic = build_static_hamiltonian(n, m, device.omegas, device.deltas, device.g)
-display(Hstatic)
-basis_ = cbas_(m, n)
 
-qch = buildQuantumComputerHamiltonian(n, m, device.omegas, device.deltas, device.g)
-display(qch.dsham)
-pobj=Pulsec(n, [[1.0, 1.0], [1.0, 1.0]], [[0.0, 1.0], [0.0, 1.0]], [1.0, 1.0], 1.0)
-ini_vec=qch.initial_state
-tlist = range(0, stop=pobj.duration, length=2000)
-
-final_state_trotter=evolve(ini_vec, pobj, qch, solver="trotter", nstep=2000, twindow=true)
-final_state_ode=evolve(ini_vec, pobj, qch, solver="ode", nstep=2000, twindow=true)
-display(final_state_trotter)
-display(final_state_ode)
